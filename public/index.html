@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work with us — LeadPilot</title>
+<style>
+  :root{
+    --bg:#0b1120; --panel:#141b2d; --line:#232c42; --ink:#eef2fb; --muted:#93a0bd;
+    --brand:#3b82f6; --brand2:#6366f1; --good:#34d399;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){--bg:#f4f7fc;--panel:#fff;--line:#e4e9f2;--ink:#121a2b;--muted:#5a6782;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:
+    radial-gradient(1200px 600px at 80% -10%,rgba(99,102,241,.18),transparent 60%),
+    radial-gradient(900px 500px at -10% 110%,rgba(59,130,246,.16),transparent 60%),
+    var(--bg);
+    color:var(--ink);min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{width:100%;max-width:560px;background:var(--panel);border:1px solid var(--line);
+    border-radius:20px;padding:30px;box-shadow:0 30px 80px -40px rgba(0,0,0,.6)}
+  .brand{display:flex;align-items:center;gap:11px;margin-bottom:6px}
+  .mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--brand),var(--brand2));
+    display:grid;place-items:center;flex:none}
+  h1{font-size:22px;margin:0}
+  .sub{color:var(--muted);font-size:14px;margin:4px 0 22px}
+  form{display:grid;gap:14px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:480px){.row{grid-template-columns:1fr}}
+  label{font-size:13px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  input,select,textarea{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);
+    border:1px solid var(--line);border-radius:11px;padding:12px 13px;width:100%;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--brand)}
+  textarea{min-height:96px;resize:vertical}
+  button{border:0;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;
+    font-size:15px;font-weight:700;padding:14px;border-radius:12px;cursor:pointer;margin-top:4px}
+  button:disabled{opacity:.6;cursor:default}
+  .err{color:#fca5a5;font-size:13px;min-height:1em}
+  .done{text-align:center;padding:10px 0}
+  .done .big{width:64px;height:64px;border-radius:50%;background:rgba(52,211,153,.15);color:var(--good);
+    display:grid;place-items:center;margin:0 auto 14px;font-size:30px}
+  .done h2{margin:0 0 6px}
+  .done p{color:var(--muted);margin:0}
+  .foot{margin-top:18px;text-align:center;font-size:12.5px;color:var(--muted)}
+  .foot a{color:var(--brand)}
+</style>
+</head>
+<body>
+<div class="card">
+  <div id="formview">
+    <div class="brand">
+      <span class="mark"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></span>
+      <div><h1>Let's work together</h1></div>
+    </div>
+    <p class="sub">Tell me about your project. You'll hear back within a day.</p>
+    <form id="lead">
+      <div class="row">
+        <label>Your name<input id="name" autocomplete="name"></label>
+        <label>Email<input id="email" type="email" autocomplete="email"></label>
+      </div>
+      <div class="row">
+        <label>Company (optional)<input id="company"></label>
+        <label>Budget<select id="budget">
+          <option>Not sure yet</option>
+          <option>Under ₹10,000</option>
+          <option>₹10,000 – ₹25,000</option>
+          <option>₹25,000 – ₹50,000</option>
+          <option>₹50,000+</option>
+        </select></label>
+      </div>
+      <label>What do you need?<textarea id="message" placeholder="e.g. An AI chatbot for my online store that answers customer questions…"></textarea></label>
+      <span class="err" id="err"></span>
+      <button id="send" type="submit">Send enquiry</button>
+    </form>
+    <p class="foot">Powered by <b>LeadPilot</b> — your enquiry is scored and routed instantly.</p>
+  </div>
+
+  <div id="doneview" class="done" hidden>
+    <div class="big">✓</div>
+    <h2>Thanks, we got it!</h2>
+    <p id="donemsg">We'll be in touch very soon.</p>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+// Read ?src= from the URL so each platform link is tagged (e.g. ?src=instagram).
+const LEAD_SOURCE = (new URLSearchParams(location.search).get('src') || 'Website').replace(/\b\w/g, c => c.toUpperCase());
+$('lead').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = $('name').value.trim(), message = $('message').value.trim();
+  if(!name){ $('err').textContent = 'Please enter your name.'; return; }
+  if(!message){ $('err').textContent = 'Please describe what you need.'; return; }
+  $('err').textContent = ''; $('send').disabled = true; $('send').textContent = 'Sending…';
+  try{
+    const res = await fetch('/api/lead', {method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        name, email:$('email').value.trim(), company:$('company').value.trim(),
+        budget:$('budget').value, message, source:LEAD_SOURCE
+      })});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'Something went wrong');
+    $('formview').hidden = true; $('doneview').hidden = false;
+  }catch(err){
+    $('err').textContent = err.message; $('send').disabled = false; $('send').textContent = 'Send enquiry';
+  }
+});
+['name','message'].forEach(id => $(id).addEventListener('input', ()=> $('err').textContent=''));
+</script>
+</body>
+</html>

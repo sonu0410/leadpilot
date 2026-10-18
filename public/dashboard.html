@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LeadPilot — Leads</title>
+<style>
+  :root{
+    --bg:#0a0f1e; --panel:#121a2e; --panel2:#182136; --line:#232e48;
+    --ink:#eaeef8; --muted:#8c99b8; --brand:#3b82f6; --brand2:#6366f1;
+    --hot:#fb7185; --warm:#fbbf24; --cold:#60a5fa; --good:#34d399;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex}
+  a{color:inherit;text-decoration:none}
+  .side{width:214px;flex:none;background:var(--panel);border-right:1px solid var(--line);
+    height:100vh;position:sticky;top:0;padding:18px 14px;display:flex;flex-direction:column;gap:5px}
+  .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 16px}
+  .brand .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center}
+  .brand b{font-size:16px}
+  .nav{font-size:14px;color:var(--muted);padding:10px 12px;border-radius:9px;display:flex;gap:10px;align-items:center}
+  .nav.active{background:var(--panel2);color:var(--ink)}
+  .nav:hover{color:var(--ink)}
+  .side .foot{margin-top:auto;font-size:12px;color:var(--muted);padding:10px 12px;border-top:1px solid var(--line)}
+  main{flex:1;padding:22px 26px;min-width:0}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+  .top h1{font-size:20px;margin:0}
+  .top p{margin:3px 0 0;color:var(--muted);font-size:13px}
+  .addbtn{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-weight:600;
+    font-size:13.5px;padding:10px 15px;border-radius:10px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px;margin-bottom:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px}
+  .card .big{font-size:25px;font-weight:700}
+  .card .lab{font-size:12px;color:var(--muted);margin-top:3px}
+  .card .lab b{color:var(--ink);font-weight:600}
+  .grid{display:grid;grid-template-columns:1.7fr 1fr;gap:14px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+  .box h3{margin:0 0 12px;font-size:14px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{text-align:left;color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;
+    letter-spacing:.04em;padding:0 8px 10px}
+  td{padding:11px 8px;border-top:1px solid var(--line);vertical-align:middle}
+  tr.lead{cursor:pointer}
+  tr.lead:hover td{background:var(--panel2)}
+  .who b{display:block}
+  .who small{color:var(--muted)}
+  .scorebar{display:flex;align-items:center;gap:8px}
+  .scorebar .track{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden;min-width:48px}
+  .scorebar .fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--brand),var(--brand2))}
+  .pill{font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+  .pill.Hot{background:rgba(251,113,133,.14);color:var(--hot)}
+  .pill.Warm{background:rgba(251,191,36,.14);color:var(--warm)}
+  .pill.Cold{background:rgba(96,165,250,.14);color:var(--cold)}
+  .srcrow{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13.5px}
+  .srcrow .nm{width:92px;flex:none;color:var(--muted)}
+  .srcrow .track{flex:1;height:7px;border-radius:4px;background:var(--line);overflow:hidden}
+  .srcrow .fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2))}
+  .srcrow b{width:30px;text-align:right}
+  .catrow{display:flex;gap:10px;margin-top:4px}
+  .cat{flex:1;text-align:center;border:1px solid var(--line);border-radius:11px;padding:12px 6px}
+  .cat .n{font-size:22px;font-weight:700}
+  .cat .l{font-size:11.5px;color:var(--muted)}
+  .empty{color:var(--muted);font-size:13px;padding:16px 4px}
+  /* modal */
+  dialog{border:0;background:transparent;padding:0;max-width:560px;width:calc(100vw - 32px)}
+  dialog::backdrop{background:rgba(3,6,15,.7)}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;color:var(--ink)}
+  .modal h3{margin:0 0 2px;font-size:20px}
+  .modal .meta{color:var(--muted);font-size:13px;margin-bottom:14px}
+  .block{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:13px;margin-bottom:12px}
+  .block .t{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px}
+  .email{white-space:pre-wrap;font-size:13.5px;line-height:1.55}
+  .mrow{display:flex;gap:10px;margin-top:6px}
+  .btn{flex:1;text-align:center;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    padding:11px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer}
+  .btn.p{background:linear-gradient(135deg,var(--brand),var(--brand2));border:0;color:#fff}
+</style>
+</head>
+<body>
+<nav class="side">
+  <div class="brand">
+    <span class="mark"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></span>
+    <b>LeadPilot</b>
+  </div>
+  <div class="nav active">👥 Leads</div>
+  <a class="nav" href="/" target="_blank">➕ Capture form</a>
+  <div class="nav" onclick="load()">🔄 Refresh</div>
+  <div class="foot" id="foot">Loading…</div>
+</nav>
+
+<main>
+  <div class="top">
+    <div><h1>Leads</h1><p>AI scores and qualifies every lead the moment it arrives.</p></div>
+    <a class="addbtn" href="/" target="_blank">+ New lead (form)</a>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="grid">
+    <div class="box">
+      <h3>All leads</h3>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Lead</th><th>Score</th><th>Source</th><th>Category</th><th>Status</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="box" style="margin-bottom:14px">
+        <h3>Lead sources</h3>
+        <div id="sources"></div>
+      </div>
+      <div class="box">
+        <h3>By category</h3>
+        <div class="catrow" id="cats"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<dialog id="modal"><div class="modal" id="modal-in"></div></dialog>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let LEADS = [];
+
+function esc(t){ const d=document.createElement('div'); d.textContent=t==null?'':t; return d.innerHTML; }
+
+function card(big,label){ return `<div class="card"><div class="big">${big}</div><div class="lab">${label}</div></div>`; }
+
+async function load(){
+  let s, l;
+  try{
+    s = await (await fetch('/api/stats')).json();
+    l = (await (await fetch('/api/leads')).json()).leads;
+  }catch{ $('foot').textContent='Could not load'; return; }
+  LEADS = l;
+
+  $('cards').innerHTML =
+    card(s.total,'Total leads') +
+    card(s.new_today,'New today') +
+    card(s.qualified,'Qualified <b>('+s.qualified_rate+'%)</b>') +
+    card(s.hot,'🔥 Hot leads') +
+    card(s.avg_score,'Avg score') +
+    card(s.ai?'On':'Fallback','AI scoring');
+
+  $('rows').innerHTML = l.length ? l.map((d,i)=>`
+    <tr class="lead" data-i="${i}">
+      <td class="who"><b>${esc(d.name)}</b><small>${esc(d.company||d.email||'—')}</small></td>
+      <td><div class="scorebar"><div class="track"><div class="fill" style="width:${d.score}%"></div></div><span>${d.score}</span></div></td>
+      <td>${esc(d.source||'Website')}</td>
+      <td><span class="pill ${d.category}">${d.category}</span></td>
+      <td>${esc(d.status||'New')}</td>
+    </tr>`).join('') : '<tr><td colspan="5" class="empty">No leads yet. Submit the capture form to see one here.</td></tr>';
+
+  document.querySelectorAll('tr.lead').forEach(r=>r.addEventListener('click',()=>openLead(+r.dataset.i)));
+
+  // sources
+  const smax = Math.max(1, ...Object.values(s.sources||{}));
+  $('sources').innerHTML = Object.keys(s.sources||{}).length
+    ? Object.entries(s.sources).map(([k,v])=>`
+      <div class="srcrow"><span class="nm">${esc(k)}</span>
+        <div class="track"><div class="fill" style="width:${Math.round(v/smax*100)}%"></div></div><b>${v}</b></div>`).join('')
+    : '<div class="empty">No data yet.</div>';
+
+  // categories
+  $('cats').innerHTML =
+    `<div class="cat"><div class="n" style="color:var(--hot)">${s.hot}</div><div class="l">Hot</div></div>`+
+    `<div class="cat"><div class="n" style="color:var(--warm)">${s.warm}</div><div class="l">Warm</div></div>`+
+    `<div class="cat"><div class="n" style="color:var(--cold)">${s.cold}</div><div class="l">Cold</div></div>`;
+
+  $('foot').textContent = 'Updated '+new Date().toLocaleTimeString();
+}
+
+function openLead(i){
+  const d = LEADS[i];
+  $('modal-in').innerHTML = `
+    <h3>${esc(d.name)} <span class="pill ${d.category}">${d.category} · ${d.score}</span></h3>
+    <div class="meta">${esc(d.company||'')} ${d.email?('· '+esc(d.email)):''} · ${esc((d.time||'').replace('T',' '))}</div>
+    <div class="block"><div class="t">Budget & source</div>${esc(d.budget||'—')} · ${esc(d.source||'Website')}</div>
+    <div class="block"><div class="t">What they want (AI summary)</div>${esc(d.summary||'—')}</div>
+    <div class="block"><div class="t">Their message</div><div class="email">${esc(d.message||'')}</div></div>
+    <div class="block"><div class="t">AI-drafted follow-up email</div><div class="email" id="mail">${esc(d.followup_email||'')}</div></div>
+    <div class="mrow">
+      <button class="btn p" id="copy">Copy email</button>
+      ${d.email?`<a class="btn" href="mailto:${esc(d.email)}?subject=${encodeURIComponent('Re: your enquiry')}&body=${encodeURIComponent(d.followup_email||'')}">Open in mail</a>`:''}
+      <button class="btn" id="close">Close</button>
+    </div>`;
+  $('modal').showModal();
+  $('close').onclick = ()=> $('modal').close();
+  $('copy').onclick = ()=>{ navigator.clipboard.writeText(d.followup_email||''); $('copy').textContent='Copied ✓'; };
+}
+$('modal').addEventListener('click',e=>{ if(e.target===$('modal')) $('modal').close(); });
+
+load();
+setInterval(load, 15000);
+</script>
+</body>
+</html>
